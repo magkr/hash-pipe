@@ -1,74 +1,76 @@
-import edu.princeton.cs.algs4.StdIn;
+import edu.princeton.cs.algs4.Stopwatch;
 
 /**
- * Created by magnu on 14/03/2017.
+ * Created by magnu on 16/03/2017.
  */
 public class HashPipe {
 
-    private Pipe root;
+    Pipe root;
 
     public HashPipe(){
-        root = new Pipe(new Pipe[8]);
-    }
+        root = new Pipe(new Pipe[32]);
+    } // create an empty symbol table
 
-    public int size(){
-        return root.pointers.length;
-    }
+    public int size(){ return 0; } // return the number of elements
 
     public void put(String key, Integer val){
-        Pipe pipe = new Pipe(key,val);
-        for(int i = 0; i < pipe.pointers.length; i++){
-            Pipe temp = floorPipe(pipe.key,i).pointers[i];
-            floorPipe(pipe.key,i).pointers[i] = pipe;
-            pipe.pointers[i] = temp;
+        if(containsKey(key)){
+            setVal(key, val);
+        } else {
+            Pipe pipe = new Pipe(key, val);
+            for (int i = 0; i < pipe.pointers.length; i++) {
+                Pipe floorTemp = floorPipe(pipe.key, i);
+                Pipe pointerTemp = floorTemp.pointers[i];
+                floorTemp.pointers[i] = pipe;
+                pipe.pointers[i] = pointerTemp;
+            }
         }
+    } // put key-value pair into the table
+
+    private Integer setVal(String key, Integer val){
+        return floorPipe(key, 0).pointers[0].val = val;
+    }
+
+    private boolean containsKey(String key){
+        Pipe temp = floorPipe(key, 0);
+        if(temp.key != null) return temp.key.equals(key);
+        else return false;
     }
 
     public Integer get(String key){
-        int i = root.pointers.length - 1;
-        Pipe current = root.pointers[i];
-        while(!current.key.equals(key)){
-            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
-                i--;
-            }
-            current = current.pointers[i];
-        }
-        return current.val;
+        return floorPipe(key, 0).pointers[0].val;
+    } // value associated with key
+
+    public String control(String key, int h){
+        Pipe temp = floorPipe(key,h).pointers[h];
+        if(temp == null) return null;
+        else if(temp.key != null) return temp.key;
+        else return null;
     }
 
     public String floor(String key){
-        return null;
-    }
+        return floorPipe(key,0).key;
+    } // largest key less than or equal to key
 
     private Pipe floorPipe(String key, int height){
-        int i = root.pointers.length - 1;
         Pipe current = root;
+        int i = current.pointers.length - 1;
         boolean found = false;
-        while(found){
-            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
-                i--;
+        while(!found){
+            while(current.pointers[i] == null && i > height) i--;
+            while (current.pointers[i] != null && current.pointers[i].key.compareTo(key) <= 0) current = current.pointers[i];
+            if(current.pointers[i] == null) {
+                if(i == height) found = true;
+            } else {
+                while (current.pointers[i].key.compareTo(key) > 0 && i > height) i--;
+                while (current.pointers[i] != null && current.pointers[i].key.compareTo(key) <= 0) current = current.pointers[i];
+                if(i == height) found = true;
             }
-            current = current.pointers[i];
-            if(i == height && current.key.compareTo(key) < 0) found = true;
         }
         return current;
-    }
+    } // pipe with largest key less than or equal to key
 
-    public String control(String key, int h){
-        int i = root.pointers.length - 1;
-        Pipe current = root;
-        boolean found = false;
-        while(found){
-            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
-                i--;
-            }
-            current = current.pointers[i];
-            if(i == h && current.key.compareTo(key) < 0) found = true;
-        }
-        return current.pointers[h].key;
-    }
-
-    private class Pipe{
+    public class Pipe{
         Integer val;
         String key;
         Pipe[] pointers;
@@ -80,18 +82,67 @@ public class HashPipe {
         public Pipe(String key, Integer val){
             this.key = key;
             this.val = val;
-            pointers = new Pipe[Integer.numberOfTrailingZeros(key.hashCode() + 1)];
+            pointers = new Pipe[Integer.numberOfTrailingZeros(key.hashCode()) + 1];
         }
     }
 
     public static void main(String[] args) {
-        System.out.println(Integer.numberOfTrailingZeros("N".hashCode()));
         HashPipe HP = new HashPipe();
-        for(int i = 0; i < 12; i++){
-            HP.put(StdIn.readString(), i);
-        }
+        HP.put("S",1);
+        System.out.println("S");
+        HP.put("E",2);
+        System.out.println("E");
+        HP.put("A",3);
+        System.out.println("A");
+        HP.put("R",4);
+        System.out.println("R");
+        HP.put("C",5);
+        System.out.println("C");
+        HP.put("H",6);
+        System.out.println("H");
+        HP.put("E",7);
+        System.out.println("E");
+        HP.put("X",8);
+        System.out.println("X");
+        HP.put("A",9);
+        System.out.println("A");
+        HP.put("M",10);
+        System.out.println("M");
+        HP.put("P",11);
+        System.out.println("P");
+        HP.put("L",12);
+        System.out.println("L");
+        HP.put("E",13);
+        System.out.println("E");
+        System.out.println(HP);
         System.out.println("P: " + HP.control("H",3));
         System.out.println("L: " + HP.control("H",2));
         System.out.println("Null: " + HP.control("P",4));
+
+        // Test
+        Stopwatch stopwatch = new Stopwatch();
+        int i = 0;
+        String [] in = new String[26];
+        for(char c = 'A'; c <= 'Z'; c++ ) in[i++] = "" + c;
+
+        HashPipe H = new HashPipe();
+
+        for( int j=0;j<in.length;j++ )
+        {
+            H.put(in[j], j);
+            System.out.print("Insert: ");
+            System.out.println(in[j]);
+            for( int g=0;g<j;g++ ) {
+                for( int h=0;h<32;h++ ) {
+                    String ctrl = H.control(in[g],h);
+                    if( ctrl != null ) System.out.print(ctrl);
+                    else System.out.print(".");
+                    System.out.print(" ");
+                }
+                System.out.print(" : ");
+                System.out.println(in[g]);
+            }
+        }
+        System.out.println("Time: " + stopwatch.elapsedTime());
     }
 }
