@@ -28,7 +28,7 @@ public class HashPipe {
         int i = root.pointers.length - 1;
         Pipe current = root.pointers[i];
         while(!current.key.equals(key)){
-            while(current.pointers[i].key.compareTo(key) > 0 || current.pointers[i] == null) {
+            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
                 i--;
             }
             current = current.pointers[i];
@@ -43,23 +43,27 @@ public class HashPipe {
     private Pipe floorPipe(String key, int height){
         int i = root.pointers.length - 1;
         Pipe current = root;
-        while(i != height && (current.key.compareTo(key) < 0)){
-            while(current.pointers[i].key.compareTo(key) > 0 || current.pointers[i] == null) {
+        boolean found = false;
+        while(found){
+            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
                 i--;
             }
             current = current.pointers[i];
+            if(i == height && current.key.compareTo(key) < 0) found = true;
         }
         return current;
     }
 
     public String control(String key, int h){
         int i = root.pointers.length - 1;
-        Pipe current = root.pointers[i];
-        while(!current.key.equals(key)){
-            while(current.pointers[i].key.compareTo(key) > 0 || current.pointers[i] == null) {
+        Pipe current = root;
+        boolean found = false;
+        while(found){
+            while(current.pointers[i] == null || current.pointers[i].key.compareTo(key) > 0) {
                 i--;
             }
             current = current.pointers[i];
+            if(i == h && current.key.compareTo(key) < 0) found = true;
         }
         return current.pointers[h].key;
     }
@@ -81,6 +85,7 @@ public class HashPipe {
     }
 
     public static void main(String[] args) {
+        System.out.println(Integer.numberOfTrailingZeros("N".hashCode()));
         HashPipe HP = new HashPipe();
         for(int i = 0; i < 12; i++){
             HP.put(StdIn.readString(), i);
