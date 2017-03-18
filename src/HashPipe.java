@@ -42,10 +42,11 @@ public class HashPipe {
     } // value associated with key
 
     public String control(String key, int h){
-        Pipe temp = floorPipe(key,h).pointers[h];
-        if(temp == null) return null;
-        else if(temp.key != null) return temp.key;
+        Pipe temp = floorPipe(key,0);
+        if(h < temp.pointers.length) temp = temp.pointers[h];
         else return null;
+        if(temp == null) return null;
+        else return temp.key;
     }
 
     public String floor(String key){
@@ -87,6 +88,7 @@ public class HashPipe {
     }
 
     public static void main(String[] args) {
+
         HashPipe HP = new HashPipe();
         HP.put("S",1);
         System.out.println("S");
@@ -144,5 +146,18 @@ public class HashPipe {
             }
         }
         System.out.println("Time: " + stopwatch.elapsedTime());
+
+        HashPipe HP1 = new HashPipe();
+        HP1.put("A",1);
+        System.out.println("A");
+        HP1.put("B",2);
+        System.out.println("B");
+        HP1.put("C",3);
+        System.out.println("C");
+        String ctrl = HP1.control("A",0);
+        System.out.print(ctrl);
+        ctrl = HP1.control("A",1);
+        System.out.print(ctrl);
+
     }
 }
